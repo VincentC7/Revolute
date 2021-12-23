@@ -7,13 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account implements Serializable {
@@ -27,7 +28,7 @@ public class Account implements Serializable {
     private String accountNumber;
     private String name;
     private String surname;
-    private LocalDate birthday;
+    private String birthday;
     private String country;
     private String passport;
     private String tel;
@@ -46,4 +47,16 @@ public class Account implements Serializable {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public static String randomIBAN() {
+        StringBuilder sb = new StringBuilder("FR");
+        for (int i = 0; i < 22; i++) {
+            sb.append((int) (Math.random() * 9));
+        }
+        sb.append( (char) ('A' + Math.random() * 26) );
+        sb.append((int) (Math.random() * 9));
+        sb.append((int) (Math.random() * 9));
+        return sb.toString();
+    }
+
 }
