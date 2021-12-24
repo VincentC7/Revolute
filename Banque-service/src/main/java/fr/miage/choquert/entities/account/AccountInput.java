@@ -2,6 +2,7 @@ package fr.miage.choquert.entities.account;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class AccountInput {
 
