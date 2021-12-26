@@ -14,6 +14,7 @@ import fr.miage.choquert.repositories.AccountsRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class RestAccountTests {
 		accountsRepository.deleteAll();
 		RestAssured.port = port;
 		account = Account.builder()
-				.id(UUID.randomUUID().toString())
+				.AccountId(UUID.randomUUID().toString())
 				.iban("FR9810096000505697927118M38").accountNumber("5697927118M")
 				.name("Choquert").surname("Vincent").birthday("27-07-1999")
 				.country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
@@ -53,7 +54,7 @@ class RestAccountTests {
 	@Test
 	@DisplayName("Select one account that exist")
 	public void getOne(){
-		Response response = when().get("/accounts/"+account.getId())
+		Response response = when().get("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_OK)
 				.extract()
@@ -150,7 +151,7 @@ class RestAccountTests {
 				.body(this.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
-				.patch("/accounts/"+account.getId())
+				.patch("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_OK)
 				.extract().response();
@@ -167,7 +168,7 @@ class RestAccountTests {
 				.body(this.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
-				.patch("/accounts/"+account.getId())
+				.patch("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_BAD_REQUEST);
 	}

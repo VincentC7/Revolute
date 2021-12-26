@@ -6,7 +6,6 @@ import fr.miage.choquert.entities.account.Account;
 
 import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.repositories.AccountsRepository;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
@@ -21,6 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,14 +54,14 @@ public class AccountRepresentation {
     public ResponseEntity<?> saveAccount(@RequestBody @Valid AccountInput account)  {
         String iban = Account.randomIBAN();
         Account account2save = Account.builder()
-                .id(UUID.randomUUID().toString())
+                .AccountId(UUID.randomUUID().toString())
                 .iban(iban).accountNumber(iban.substring(14,25))
                 .name(account.getName()).surname(account.getSurname()).birthday(account.getBirthday())
                 .country(account.getCountry()).passport(account.getPassport()).tel(account.getTel())
                 .secret(account.getSecret()).balance(0.0)
                 .build();
         Account saved = accountsRepository.save(account2save);
-        URI location = linkTo(AccountRepresentation.class).slash(saved.getId()).toUri();
+        URI location = linkTo(AccountRepresentation.class).slash(saved.getAccountId()).toUri();
         return ResponseEntity.created(location).build();
     }
 
@@ -86,7 +86,7 @@ public class AccountRepresentation {
             System.out.println(accountInput);
             try {
                 validator.validate(accountInput);
-                account.setId(accountId);
+                account.setAccountId(accountId);
                 accountsRepository.save(account);
                 return ResponseEntity.ok(assembler.toModel(account));
             }catch (ConstraintViolationException e){
