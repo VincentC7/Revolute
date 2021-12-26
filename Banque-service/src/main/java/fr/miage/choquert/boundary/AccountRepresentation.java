@@ -62,8 +62,7 @@ public class AccountRepresentation {
                 .build();
         Account saved = accountsRepository.save(account2save);
         URI location = linkTo(AccountRepresentation.class).slash(saved.getId()).toUri();
-        EntityModel<Account> body = assembler.toModel(saved);
-        return ResponseEntity.created(location).body(body);
+        return ResponseEntity.created(location).build();
     }
 
     // PATCH
