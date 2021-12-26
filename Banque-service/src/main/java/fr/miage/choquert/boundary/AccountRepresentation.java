@@ -97,4 +97,16 @@ public class AccountRepresentation {
         return ResponseEntity.notFound().build();
     }
 
+    // GET /accounts/{accountId}/balance
+    @GetMapping(value = "/{accountId}/balance")
+    public ResponseEntity<?> getAccountBalance(@PathVariable("accountId") String accountId) {
+        return Optional.of(accountsRepository.findById(accountId)).filter(Optional::isPresent)
+                .map(i -> ResponseEntity.ok().body(
+                        "{\n" +
+                                "\t\"balance\" :"+i.get().getBalance()+",\n" +
+                        "}"
+                        ))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

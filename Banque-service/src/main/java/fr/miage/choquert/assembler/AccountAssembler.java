@@ -14,7 +14,10 @@ public class AccountAssembler {
     public EntityModel<Account> toModel(Account compte){
         return EntityModel.of(compte,
                 linkTo(methodOn(AccountRepresentation.class)
-                        .getOneCompte(compte.getId())).withSelfRel());
+                        .getOneCompte(compte.getId())).withSelfRel(),
+                linkTo(methodOn(AccountRepresentation.class)
+                        .getAccountBalance(compte.getId())).withRel("balance")
+        );
     }
 
 }
