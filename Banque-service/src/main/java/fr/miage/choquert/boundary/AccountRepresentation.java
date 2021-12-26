@@ -6,6 +6,7 @@ import fr.miage.choquert.entities.account.Account;
 
 import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.repositories.AccountsRepository;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
@@ -61,7 +62,8 @@ public class AccountRepresentation {
                 .build();
         Account saved = accountsRepository.save(account2save);
         URI location = linkTo(AccountRepresentation.class).slash(saved.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        EntityModel<Account> body = assembler.toModel(saved);
+        return ResponseEntity.created(location).body(body);
     }
 
     // PATCH
