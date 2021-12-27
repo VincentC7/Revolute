@@ -49,4 +49,20 @@ public class Card implements Serializable {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public static String randomCardNumber(){
+        return randomStringNumber(16);
+    }
+
+    public static int randomCrypto(){
+        return Integer.parseInt(randomStringNumber(3));
+    }
+
+    private static String randomStringNumber(int length){
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append((int) (Math.random() * 10));
+        }
+        return sb.toString();
+    }
 }

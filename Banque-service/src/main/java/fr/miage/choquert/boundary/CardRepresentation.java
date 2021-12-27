@@ -3,17 +3,22 @@ package fr.miage.choquert.boundary;
 import fr.miage.choquert.assembler.CardAssembler;
 import fr.miage.choquert.entities.account.Account;
 import fr.miage.choquert.entities.card.Card;
+import fr.miage.choquert.entities.card.CardInput;
 import fr.miage.choquert.repositories.AccountsRepository;
 import fr.miage.choquert.repositories.CardsRepository;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "accounts/{accountId}/cards", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,4 +57,25 @@ public class CardRepresentation {
                 .map(i -> ResponseEntity.ok(cardAssembler.toModel(i.get(), accountId)))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    //POST /accounts/{accountId}/cards
+    @PostMapping
+    @Transactional
+    public ResponseEntity<?> saveCard(@PathVariable("accountId") String accountId, @RequestBody @Valid CardInput card)  {
+        Optional<Account> account = accountsRepository.findById(accountId);
+        if (account.isPresent()){
+            Card card2save = Card.builder()
+                    .cardId(UUID.randomUUID().toString()).cardNumber(Card.randomCardNumber())
+                    .code(card.getCode()).cryptogram(Card.randomCrypto()).ceiling(card.getCeiling())
+                    .blocked(card.isBlocked()).contact(card.isContact()).virtual(card.isVirtual())
+                    .longitude(card.getLongitude()).latitude(card.getLatitude()).account(account.get())
+                    .build();
+            Card saved = cardsRepository.save(card2save);
+            URI location = linkTo(methodOn(CardRepresentation.class).getOneCard(accountId, saved.getCardId())).toUri();
+            return ResponseEntity.created(location).build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
 }

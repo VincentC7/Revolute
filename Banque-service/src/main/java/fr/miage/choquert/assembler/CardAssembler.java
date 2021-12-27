@@ -22,7 +22,7 @@ public class CardAssembler {
     public EntityModel<Card> toModel(Card card, String accountId) {
         return EntityModel.of(card,
                 linkTo(methodOn(CardRepresentation.class)
-                        .getOneCard(card.getCardId(), accountId)).withSelfRel()
+                        .getOneCard(accountId, card.getCardId())).withSelfRel()
         );
     }
 
