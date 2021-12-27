@@ -1,4 +1,4 @@
-package fr.miage.choquert;
+package fr.miage.choquert.account;
 
 
 import fr.miage.choquert.entities.account.Account;

@@ -1,4 +1,4 @@
-package fr.miage.choquert;
+package fr.miage.choquert.account;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
