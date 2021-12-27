@@ -20,7 +20,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,7 +82,6 @@ public class AccountRepresentation {
                     .country(account.getCountry()).passport(account.getPassport()).tel(account.getTel())
                     .secret(account.getSecret())
                     .build();
-            System.out.println(accountInput);
             try {
                 validator.validate(accountInput);
                 account.setAccountId(accountId);

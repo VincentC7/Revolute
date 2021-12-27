@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 
@@ -20,10 +21,15 @@ public class CardInput {
     @NotNull
     @Size(min = 4, max = 4)
     private String code;
+
+    @Positive
     private double ceiling;
+
+
     private boolean blocked;
     private boolean contact;
     private boolean virtual;
+
     private double longitude;
     private double latitude;
 
