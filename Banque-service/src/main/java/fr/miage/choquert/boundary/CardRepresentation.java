@@ -61,6 +61,8 @@ public class CardRepresentation {
     //GET /accounts/{accountId}/cards/{cardId}
     @GetMapping(value = "/{cardId}")
     public ResponseEntity<?> getOneCard(@PathVariable("accountId") String accountId, @PathVariable("cardId") String cardId) {
+        Optional<Account> account = accountsRepository.findById(accountId);
+        if(account.isEmpty()) return ResponseEntity.notFound().build();
         return Optional.of(cardsRepository.findById(cardId)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(cardAssembler.toModel(i.get(), accountId)))
                 .orElse(ResponseEntity.notFound().build());
