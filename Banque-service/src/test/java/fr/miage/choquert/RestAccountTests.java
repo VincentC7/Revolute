@@ -84,7 +84,7 @@ class RestAccountTests {
 				.then()
 				.statusCode(HttpStatus.SC_CREATED)
 				.extract().response();
-		String location = response.getContentType();
+		String location = response.getHeader("location");
 		when().get(location).then().statusCode(HttpStatus.SC_OK);
 	}
 
