@@ -21,6 +21,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -103,8 +104,9 @@ public class CardRepresentation {
 
         try {
             AtomicBoolean badrequest = new AtomicBoolean(false);
+            String[] immutableParams = {"cardId","cardNumber","cryptogram","contact","virtual","account"};
             fields.forEach((f, v) -> {
-                if (f == "virtual" || f == "contact") {
+                if (Arrays.asList(immutableParams).contains(f.toString())) {
                     badrequest.set(true);
                 }else {
                     Field field = ReflectionUtils.findField(Card.class, f.toString());
