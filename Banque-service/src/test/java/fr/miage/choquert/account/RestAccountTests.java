@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.miage.choquert.Util;
 import fr.miage.choquert.entities.account.Account;
 import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.repositories.AccountsRepository;
@@ -77,7 +78,7 @@ class RestAccountTests {
 				.country("France").passport("123456789").tel("+0033636790462").secret("secret")
 				.build();
 		Response response = given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.post("/accounts")
@@ -126,7 +127,7 @@ class RestAccountTests {
 				.country(country).passport(passport).tel(tel).secret(secret)
 				.build();
 		given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.post("/accounts")
@@ -134,10 +135,6 @@ class RestAccountTests {
 				.statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 
-	private String toJsonString(Object o) throws Exception {
-		ObjectMapper map = new ObjectMapper();
-		return map.writeValueAsString(o);
-	}
 
 	@Test
 	@DisplayName("patch account succes")
@@ -148,7 +145,7 @@ class RestAccountTests {
 				.secret(account.getSecret())
 				.build();
 		Response response = given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.patch("/accounts/"+account.getAccountId())
@@ -165,7 +162,7 @@ class RestAccountTests {
 	public void patchAccountFail() throws Exception {
 		AccountInput accountInput = AccountInput.builder().tel("test").build();
 		given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.patch("/accounts/"+account.getAccountId())
@@ -177,7 +174,7 @@ class RestAccountTests {
 	@DisplayName("patch one account that not exist")
 	public void patchNotFound() throws Exception {
 		AccountInput accountInput = AccountInput.builder().name("Choquert").build();
-		given().body(this.toJsonString(accountInput))
+		given().body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.patch("/accounts/42")
 				.then()

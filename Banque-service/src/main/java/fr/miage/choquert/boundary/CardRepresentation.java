@@ -123,10 +123,9 @@ public class CardRepresentation {
                     .build();
             cardValidator.validate(cardInput);
             card.setCardId(cardId);
-            System.out.println("aaaaa");
             cardsRepository.save(card);
             return ResponseEntity.ok(cardAssembler.toModel(card, accountId));
-        }catch (ConstraintViolationException e){
+        }catch (ConstraintViolationException | IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }
     }
