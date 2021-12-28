@@ -108,9 +108,12 @@ public class CardRepresentation {
                     badrequest.set(true);
                 }else {
                     Field field = ReflectionUtils.findField(Card.class, f.toString());
-                    assert field != null;
-                    field.setAccessible(true);
-                    ReflectionUtils.setField(field, card, v);
+                    if (field == null){
+                        badrequest.set(true);
+                    }else{
+                        field.setAccessible(true);
+                        ReflectionUtils.setField(field, card, v);
+                    }
                 }
             });
             if (badrequest.get()) return ResponseEntity.badRequest().build();

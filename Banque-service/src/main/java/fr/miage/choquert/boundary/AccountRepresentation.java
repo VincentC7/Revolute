@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @RestController
@@ -71,12 +72,17 @@ public class AccountRepresentation {
         Optional<Account> body = accountsRepository.findById(accountId);
         if (body.isPresent()) {
             Account account = body.get();
+            AtomicBoolean badrequest = new AtomicBoolean(false);
             fields.forEach((f, v) -> {
                 Field field = ReflectionUtils.findField(Account.class, f.toString());
-                assert field != null;
-                field.setAccessible(true);
-                ReflectionUtils.setField(field, account, v);
+                if (field == null) {
+                    badrequest.set(true);
+                } else {
+                    field.setAccessible(true);
+                    ReflectionUtils.setField(field, account, v);
+                }
             });
+            if (badrequest.get()) return ResponseEntity.badRequest().build();
             AccountInput accountInput = AccountInput.builder()
                     .name(account.getName()).surname(account.getSurname()).birthday(account.getBirthday())
                     .country(account.getCountry()).passport(account.getPassport()).tel(account.getTel())
