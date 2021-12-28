@@ -23,7 +23,7 @@ public class Account implements Serializable {
     private static final long serialVersionUID = 267433254591L;
 
     @Id
-    private String AccountId;
+    private String accountId;
     private String iban;
     private String accountNumber;
     private String name;
@@ -44,7 +44,7 @@ public class Account implements Serializable {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Account account = (Account) o;
-        return AccountId != null && Objects.equals(AccountId, account.AccountId);
+        return accountId != null && Objects.equals(accountId, account.accountId);
     }
 
     @Override

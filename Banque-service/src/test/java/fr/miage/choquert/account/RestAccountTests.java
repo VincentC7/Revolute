@@ -7,7 +7,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.miage.choquert.Util;
 import fr.miage.choquert.entities.account.Account;
 import fr.miage.choquert.entities.account.AccountInput;
@@ -15,12 +14,12 @@ import fr.miage.choquert.repositories.AccountsRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -44,7 +43,7 @@ class RestAccountTests {
 		accountsRepository.deleteAll();
 		RestAssured.port = port;
 		account = Account.builder()
-				.AccountId(UUID.randomUUID().toString())
+				.accountId(UUID.randomUUID().toString())
 				.iban("FR9810096000505697927118M38").accountNumber("5697927118M")
 				.name("Choquert").surname("Vincent").birthday("27-07-1999")
 				.country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
@@ -169,6 +168,20 @@ class RestAccountTests {
 				.then()
 				.statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
+
+    @ParameterizedTest
+    @ValueSource(strings = {"accountId", "iban", "accountNumber","balance"})
+    @DisplayName("patch one account that exist but params can't be changed")
+    public void patchAccountFailImmutableParams(String immutableParam) {
+        String json = "{\""+immutableParam+"\":\"123.00\"}";
+        given()
+                .body(json)
+                .contentType(ContentType.JSON)
+                .when()
+                .patch("/accounts/"+account.getAccountId())
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
 
 	@Test
 	@DisplayName("patch one account that not exist")

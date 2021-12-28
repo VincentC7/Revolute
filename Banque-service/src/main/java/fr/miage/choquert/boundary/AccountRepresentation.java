@@ -54,7 +54,7 @@ public class AccountRepresentation {
     public ResponseEntity<?> saveAccount(@RequestBody @Valid AccountInput account)  {
         String iban = Account.randomIBAN();
         Account account2save = Account.builder()
-                .AccountId(UUID.randomUUID().toString())
+                .accountId(UUID.randomUUID().toString())
                 .iban(iban).accountNumber(iban.substring(14,25))
                 .name(account.getName()).surname(account.getSurname()).birthday(account.getBirthday())
                 .country(account.getCountry()).passport(account.getPassport()).tel(account.getTel())

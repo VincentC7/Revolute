@@ -2,7 +2,6 @@ package fr.miage.choquert.card;
 
 import fr.miage.choquert.Util;
 import fr.miage.choquert.entities.account.Account;
-import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.entities.card.Card;
 import fr.miage.choquert.entities.card.CardInput;
 import fr.miage.choquert.repositories.AccountsRepository;
@@ -51,7 +50,7 @@ public class RestCardTests {
         accountsRepository.deleteAll();
         RestAssured.port = port;
         account = Account.builder()
-                .AccountId(UUID.randomUUID().toString())
+                .accountId(UUID.randomUUID().toString())
                 .iban("FR9810096000505697927118M38").accountNumber("5697927118M")
                 .name("Choquert").surname("Vincent").birthday("27-07-1999")
                 .country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
