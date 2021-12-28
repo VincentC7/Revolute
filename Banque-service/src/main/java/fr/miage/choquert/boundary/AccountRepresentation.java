@@ -5,6 +5,7 @@ import fr.miage.choquert.entities.account.AccountValidator;
 import fr.miage.choquert.entities.account.Account;
 
 import fr.miage.choquert.entities.account.AccountInput;
+import fr.miage.choquert.entities.card.Card;
 import fr.miage.choquert.repositories.AccountsRepository;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
@@ -20,6 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,13 +75,18 @@ public class AccountRepresentation {
         if (body.isPresent()) {
             Account account = body.get();
             AtomicBoolean badrequest = new AtomicBoolean(false);
+            String[] immutableParams = {"accountId","iban","accountNumber","balance"};
             fields.forEach((f, v) -> {
-                Field field = ReflectionUtils.findField(Account.class, f.toString());
-                if (field == null) {
+                if (Arrays.asList(immutableParams).contains(f.toString())) {
                     badrequest.set(true);
-                } else {
-                    field.setAccessible(true);
-                    ReflectionUtils.setField(field, account, v);
+                }else {
+                    Field field = ReflectionUtils.findField(Account.class, f.toString());
+                    if (field == null){
+                        badrequest.set(true);
+                    }else{
+                        field.setAccessible(true);
+                        ReflectionUtils.setField(field, account, v);
+                    }
                 }
             });
             if (badrequest.get()) return ResponseEntity.badRequest().build();
@@ -93,7 +100,7 @@ public class AccountRepresentation {
                 account.setAccountId(accountId);
                 accountsRepository.save(account);
                 return ResponseEntity.ok(assembler.toModel(account));
-            }catch (ConstraintViolationException e){
+            }catch (ConstraintViolationException | IllegalArgumentException e){
                 return ResponseEntity.badRequest().build();
             }
         }
