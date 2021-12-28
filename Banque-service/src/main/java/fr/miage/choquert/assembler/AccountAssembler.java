@@ -2,6 +2,7 @@ package fr.miage.choquert.assembler;
 
 import fr.miage.choquert.boundary.AccountRepresentation;
 import fr.miage.choquert.boundary.CardRepresentation;
+import fr.miage.choquert.boundary.OperationRepresentation;
 import fr.miage.choquert.entities.account.Account;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,9 @@ public class AccountAssembler {
                 linkTo(methodOn(AccountRepresentation.class)
                         .getAccountBalance(compte.getAccountId())).withRel("balance"),
                 linkTo(methodOn(CardRepresentation.class)
-                        .getAccountCards(compte.getAccountId())).withRel("cards")
+                        .getAccountCards(compte.getAccountId())).withRel("cards"),
+                linkTo(methodOn(OperationRepresentation.class)
+                        .getAccountOperations(compte.getAccountId())).withRel("operations")
         );
     }
 

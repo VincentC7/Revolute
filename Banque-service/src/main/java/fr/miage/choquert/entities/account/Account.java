@@ -1,6 +1,7 @@
 package fr.miage.choquert.entities.account;
 
 import fr.miage.choquert.entities.card.Card;
+import fr.miage.choquert.entities.operation.Operation;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -38,6 +39,10 @@ public class Account implements Serializable {
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Card> cards;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Operation> operations;
 
     @Override
     public boolean equals(Object o) {
