@@ -70,8 +70,6 @@ public class RestCardTests {
                 .ceiling(500.0).blocked(false).virtual(false).contact(true)
                 .latitude(0.0).latitude(0.0).account(account)
                 .build();
-        card2.setCardId(UUID.randomUUID().toString());
-        card2.setCardNumber("2222222222222222");
         cardsRepository.save(card2);
     }
 
