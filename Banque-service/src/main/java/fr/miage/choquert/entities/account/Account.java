@@ -1,14 +1,14 @@
 package fr.miage.choquert.entities.account;
 
+import fr.miage.choquert.entities.card.Card;
+import fr.miage.choquert.entities.operation.Operation;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.io.Serial;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -19,11 +19,10 @@ import java.util.Objects;
 @NoArgsConstructor
 public class Account implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 267433254591L;
 
     @Id
-    private String id;
+    private String accountId;
     private String iban;
     private String accountNumber;
     private String name;
@@ -35,12 +34,20 @@ public class Account implements Serializable {
     private String secret;
     private Double balance;
 
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Card> cards;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Operation> operations;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Account account = (Account) o;
-        return id != null && Objects.equals(id, account.id);
+        return accountId != null && Objects.equals(accountId, account.accountId);
     }
 
     @Override

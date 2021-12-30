@@ -1,4 +1,4 @@
-package fr.miage.choquert;
+package fr.miage.choquert.account;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.miage.choquert.Util;
 import fr.miage.choquert.entities.account.Account;
 import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.repositories.AccountsRepository;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -42,7 +43,7 @@ class RestAccountTests {
 		accountsRepository.deleteAll();
 		RestAssured.port = port;
 		account = Account.builder()
-				.id(UUID.randomUUID().toString())
+				.accountId(UUID.randomUUID().toString())
 				.iban("FR9810096000505697927118M38").accountNumber("5697927118M")
 				.name("Choquert").surname("Vincent").birthday("27-07-1999")
 				.country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
@@ -53,7 +54,7 @@ class RestAccountTests {
 	@Test
 	@DisplayName("Select one account that exist")
 	public void getOne(){
-		Response response = when().get("/accounts/"+account.getId())
+		Response response = when().get("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_OK)
 				.extract()
@@ -76,14 +77,14 @@ class RestAccountTests {
 				.country("France").passport("123456789").tel("+0033636790462").secret("secret")
 				.build();
 		Response response = given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.post("/accounts")
 				.then()
 				.statusCode(HttpStatus.SC_CREATED)
 				.extract().response();
-		String location = response.getContentType();
+		String location = response.getHeader("location");
 		when().get(location).then().statusCode(HttpStatus.SC_OK);
 	}
 
@@ -125,7 +126,7 @@ class RestAccountTests {
 				.country(country).passport(passport).tel(tel).secret(secret)
 				.build();
 		given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
 				.post("/accounts")
@@ -133,10 +134,6 @@ class RestAccountTests {
 				.statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
 
-	private String toJsonString(Object o) throws Exception {
-		ObjectMapper map = new ObjectMapper();
-		return map.writeValueAsString(o);
-	}
 
 	@Test
 	@DisplayName("patch account succes")
@@ -147,10 +144,10 @@ class RestAccountTests {
 				.secret(account.getSecret())
 				.build();
 		Response response = given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
-				.patch("/accounts/"+account.getId())
+				.patch("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_OK)
 				.extract().response();
@@ -164,19 +161,33 @@ class RestAccountTests {
 	public void patchAccountFail() throws Exception {
 		AccountInput accountInput = AccountInput.builder().tel("test").build();
 		given()
-				.body(this.toJsonString(accountInput))
+				.body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.when()
-				.patch("/accounts/"+account.getId())
+				.patch("/accounts/"+account.getAccountId())
 				.then()
 				.statusCode(HttpStatus.SC_BAD_REQUEST);
 	}
+
+    @ParameterizedTest
+    @ValueSource(strings = {"accountId", "iban", "accountNumber","balance"})
+    @DisplayName("patch one account that exist but params can't be changed")
+    public void patchAccountFailImmutableParams(String immutableParam) {
+        String json = "{\""+immutableParam+"\":\"123.00\"}";
+        given()
+                .body(json)
+                .contentType(ContentType.JSON)
+                .when()
+                .patch("/accounts/"+account.getAccountId())
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
 
 	@Test
 	@DisplayName("patch one account that not exist")
 	public void patchNotFound() throws Exception {
 		AccountInput accountInput = AccountInput.builder().name("Choquert").build();
-		given().body(this.toJsonString(accountInput))
+		given().body(Util.toJsonString(accountInput))
 				.contentType(ContentType.JSON)
 				.patch("/accounts/42")
 				.then()
