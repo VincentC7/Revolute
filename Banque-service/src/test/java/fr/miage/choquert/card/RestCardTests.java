@@ -10,6 +10,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,12 @@ public class RestCardTests {
                 .latitude(0.0).latitude(0.0).account(account)
                 .build();
         cardsRepository.save(card2);
+    }
+
+    @AfterEach
+    public void clean(){
+        cardsRepository.deleteAll();
+        accountsRepository.deleteAll();
     }
 
     @Test

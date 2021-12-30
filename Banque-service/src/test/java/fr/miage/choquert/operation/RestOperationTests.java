@@ -7,9 +7,7 @@ import fr.miage.choquert.repositories.OperationRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -62,6 +60,12 @@ public class RestOperationTests {
                 .account(account)
                 .build();
         operationRepository.save(o2);
+    }
+
+    @AfterEach
+    public void clean(){
+        operationRepository.deleteAll();
+        accountsRepository.deleteAll();
     }
 
     @Test
