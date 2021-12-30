@@ -5,10 +5,8 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -22,7 +20,6 @@ import java.util.Objects;
 @NoArgsConstructor
 public class Operation implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 712413359181L;
 
     @Id

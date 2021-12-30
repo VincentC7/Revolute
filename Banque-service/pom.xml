@@ -13,14 +13,12 @@
 
     <groupId>fr.miage.choquert</groupId>
     <artifactId>Banque-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Banque-service</name>
     <description>Service principal du projet Revolute</description>
 
     <properties>
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>11</java.version>
     </properties>
 
     <dependencies>

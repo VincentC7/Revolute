@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -18,7 +17,6 @@ import java.util.Objects;
 @NoArgsConstructor
 public class Card implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 497413254891L;
 
     @Id

@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -20,7 +19,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class Account implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 267433254591L;
 
     @Id
