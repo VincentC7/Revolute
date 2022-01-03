@@ -5,8 +5,15 @@ import fr.miage.choquert.entities.account.AccountValidator;
 import fr.miage.choquert.entities.account.Account;
 
 import fr.miage.choquert.entities.account.AccountInput;
-import fr.miage.choquert.entities.card.Card;
 import fr.miage.choquert.repositories.AccountsRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
@@ -31,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RestController
 @RequestMapping(value = "accounts", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(Account.class)
+@Tag(name = "Accounts", description = "the account API ressources")
 public class AccountRepresentation {
 
     private final AccountsRepository accountsRepository;
@@ -44,6 +52,13 @@ public class AccountRepresentation {
     }
 
     // GET /accounts/{accountId}
+    @Operation(summary = "Find account by ID", description = "Returns a single account", tags = { "account" })
+    @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account Id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation",
+                    content = @Content(schema = @Schema(implementation = Account.class))),
+            @ApiResponse(responseCode = "404", description = "Account not found") }
+    )
     @GetMapping(value = "/{accountId}")
     public ResponseEntity<?> getOneCompte(@PathVariable("accountId") String accountId) {
         return Optional.of(accountsRepository.findById(accountId)).filter(Optional::isPresent)
@@ -51,6 +66,13 @@ public class AccountRepresentation {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // POST /accounts
+    @Operation(summary = "Create new account", description = "create a new account and insert it in database", tags = { "account" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Account created",
+                    content = @Content(schema = @Schema(implementation = Account.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+    })
     @PostMapping
     @Transactional
     public ResponseEntity<?> saveAccount(@RequestBody @Valid AccountInput account)  {
@@ -68,6 +90,13 @@ public class AccountRepresentation {
     }
 
     // PATCH
+    @Operation(summary = "Update an existing account", description = "", tags = { "account" })
+    @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account Id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation",
+                    content = @Content(schema = @Schema(implementation = Account.class))),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
     @PatchMapping(value = "/{accountId}")
     @Transactional
     public ResponseEntity<?> updateAccountPartiel(@PathVariable("accountId") String accountId, @RequestBody Map<Object, Object> fields) {
@@ -109,6 +138,12 @@ public class AccountRepresentation {
 
     // GET /accounts/{accountId}/balance
     @GetMapping(value = "/{accountId}/balance")
+    @Operation(summary = "Get balance of an existing account", description = "", tags = { "account" })
+    @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account Id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
     public ResponseEntity<?> getAccountBalance(@PathVariable("accountId") String accountId) {
         return Optional.of(accountsRepository.findById(accountId)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok().body(

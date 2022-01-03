@@ -7,6 +7,15 @@ import fr.miage.choquert.entities.card.CardInput;
 import fr.miage.choquert.entities.card.CardValidator;
 import fr.miage.choquert.repositories.AccountsRepository;
 import fr.miage.choquert.repositories.CardsRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RestController
 @RequestMapping(value = "accounts/{accountId}/cards", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(Card.class)
+@Tag(name = "Cards", description = "the card API ressources")
 public class CardRepresentation {
 
     private final AccountsRepository accountsRepository;
@@ -47,6 +57,13 @@ public class CardRepresentation {
 
 
     //GET /accounts/{accountId}/cards
+    @Operation(summary = "Find account cards by accountID", description = "Returns all account cards", tags = { "account", "card" })
+    @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation",
+                    content = @Content(schema = @Schema(implementation = Card.class))),
+            @ApiResponse(responseCode = "404", description = "account not found") }
+    )
     @GetMapping
     public ResponseEntity<?> getAccountCards(@PathVariable("accountId") String accountId) {
         Optional<Account> account = accountsRepository.findById(accountId);
@@ -60,6 +77,17 @@ public class CardRepresentation {
     }
 
     //GET /accounts/{accountId}/cards/{cardId}
+    @Operation(summary = "Find account card by ID", description = "Returns a single card", tags = { "account", "card" })
+    @Parameters(value = {
+            @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account id"),
+            @Parameter(in = ParameterIn.PATH, name = "cardId", description = "Card id")
+    }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation",
+                    content = @Content(schema = @Schema(implementation = Card.class))),
+            @ApiResponse(responseCode = "404", description = "account or card not found") }
+    )
     @GetMapping(value = "/{cardId}")
     public ResponseEntity<?> getOneCard(@PathVariable("accountId") String accountId, @PathVariable("cardId") String cardId) {
         Optional<Account> account = accountsRepository.findById(accountId);
@@ -70,6 +98,13 @@ public class CardRepresentation {
     }
 
     //POST /accounts/{accountId}/cards
+    @Operation(summary = "Create new card for an account", description = "create a new card and insert it in database", tags = { "account", "card" })
+    @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Card created",
+                    content = @Content(schema = @Schema(implementation = Card.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+    })
     @PostMapping
     @Transactional
     public ResponseEntity<?> saveCard(@PathVariable("accountId") String accountId, @RequestBody @Valid CardInput card)  {
@@ -89,6 +124,15 @@ public class CardRepresentation {
     }
 
     //PATCH /accounts/{accountId}/cards/{cardId}
+    @Operation(summary = "Update an existing card", description = "", tags = { "account", "card" })
+    @Parameters(value = {
+            @Parameter(in = ParameterIn.PATH, name = "accountId", description = "Account id"),
+            @Parameter(in = ParameterIn.PATH, name = "cardId", description = "Card id")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
     @PatchMapping(value = "/{cardId}")
     @Transactional
     public ResponseEntity<?> updateCardPartiel(@PathVariable("accountId") String accountId,
