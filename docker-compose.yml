@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  # ============================= Databases ========================================
   banque-pg:
     image: 'postgres:13.1-alpine'
     container_name: db
@@ -9,9 +10,23 @@ services:
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=BanqueService
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data/banque_pg:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
+
+  keycloack-pg:
+    image: 'postgres:13.1-alpine'
+    container_name: db-keycloack
+    environment:
+      - POSTGRES_USER=keycloackUser
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=keycloack
+    volumes:
+      - ./data/keycloack_pg:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  # ============================= Banque service ========================================
   banque:
     build:
       context: ./Banque-service
@@ -30,5 +45,28 @@ services:
         delay: 10s
         max_attempts: 3
         window: 120s
+
+  # ================================ keycloack ===========================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:15.0.2
+    ports:
+      - "8180:8180"
+    command: [ "-Djboss.socket.binding.port-offset=100" ]
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloack
+      DB_USER: keycloackUser
+      DB_PASSWORD: 123456
+      DB_SCHEMA: public
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+    restart: on-failure
+    networks:
+      - local-keycloak
+
 volumes:
   data:
+
+networks:
+  local-keycloak:
