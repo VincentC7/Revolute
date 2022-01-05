@@ -1,17 +1,18 @@
 version: '3'
 
 services:
-  db:
+  banque-pg:
     image: 'postgres:13.1-alpine'
     container_name: db
     environment:
-      - POSTGRES_USER=revolut
-      - POSTGRES_PASSWORD=revolut
-      - POSTGRES_DB=revolut
+      - POSTGRES_USER=BanqueServiceUser
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=BanqueService
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data/banque_pg:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
+
   mysql:
     image: mysql:5.7
     restart: always
@@ -21,7 +22,8 @@ services:
       MYSQL_PASSWORD: keycloakPassword
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - ./keycloak-data:/var/lib/mysql
+      - ./data/keycloack_pg-data:/var/lib/mysql
+
   keycloak:
     image: quay.io/keycloak/keycloak:15.0.2
     ports:
@@ -45,9 +47,9 @@ services:
 #    depends_on:
 #      - db
 #    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/revolut
-#      - SPRING_DATASOURCE_USERNAME=revolut
-#      - SPRING_DATASOURCE_PASSWORD=revolut
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/BanqueService
+#      - SPRING_DATASOURCE_USERNAME=BanqueServiceUser
+#      - SPRING_DATASOURCE_PASSWORD=123456
 #      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 #    ports:
 #      - "8080:8080"
@@ -59,4 +61,3 @@ services:
 #        window: 120s
 volumes:
   data:
-  keycloak-data:
