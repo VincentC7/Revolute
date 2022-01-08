@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OperationMerchant {
 
-    private Long id;
     private String message;
     private BigDecimal ammout;
     private int port;

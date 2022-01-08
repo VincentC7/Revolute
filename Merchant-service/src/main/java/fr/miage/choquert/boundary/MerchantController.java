@@ -39,7 +39,6 @@ public class MerchantController {
 		String url = "http://" + instance.getHost() + ":" + instance.getPort() + "/pay/card/{number}/code/{code}/ammount/{ammout}";
 		PaymentResponseBean response = template.getForObject(url, PaymentResponseBean.class, number, code, ammout);
 		return PaymentResponseBean.builder()
-				.id(response.getId())
 				.message(response.getMessage())
 				.port(response.getPort())
 				.build();
@@ -54,7 +53,6 @@ public class MerchantController {
         String url = "http://" + instance.getHost() + ":" + instance.getPort() + "/pay";
         PaymentResponseBean response = template.postForObject(url, paymentInput, PaymentResponseBean.class);
         return PaymentResponseBean.builder()
-                .id(response.getId())
                 .message(response.getMessage())
                 .port(response.getPort())
                 .build();
@@ -62,7 +60,6 @@ public class MerchantController {
 
 	private PaymentResponseBean fallbackBankCall(RuntimeException re){
 		return PaymentResponseBean.builder()
-				.id(-1L)
 				.message("Unable to access the service")
 				.ammout(new BigDecimal(0))
 				.build();

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -43,19 +44,19 @@ public class RestOperationTests {
                 .accountId(UUID.randomUUID().toString())
                 .iban("FR9810096000505697927118M38").accountNumber("5697927118M")
                 .name("Choquert").surname("Vincent").birthday("27-07-1999")
-                .country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
+                .country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(new BigDecimal(1000))
                 .build();
         accountsRepository.save(account);
 
         o1 = Operation.builder()
                 .operationId(UUID.randomUUID().toString())
-                .country("France").datePerformed(Instant.now()).montant(5).ibanCrediteur("FR1111111111111111111111M38")
+                .country("France").datePerformed(Instant.now()).montant(new BigDecimal(5)).ibanCrediteur("FR1111111111111111111111M38")
                 .libelle("test d'achat").categorie("Divers").account(account).virement(false)
                 .build();
         operationRepository.save(o1);
         o2 = Operation.builder()
                 .operationId(UUID.randomUUID().toString())
-                .country("France").datePerformed(Instant.now()).montant(1500).ibanCrediteur("FR2222222222222222222222M38")
+                .country("France").datePerformed(Instant.now()).montant(new BigDecimal(1500)).ibanCrediteur("FR2222222222222222222222M38")
                 .libelle("un achat trop bien").categorie("Divers").account(account).virement(false)
                 .account(account)
                 .build();

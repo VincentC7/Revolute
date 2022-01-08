@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -54,7 +55,7 @@ public class RestCardTests {
                 .accountId(UUID.randomUUID().toString())
                 .iban("FR9810096000505697927118M38").accountNumber("5697927118M")
                 .name("Choquert").surname("Vincent").birthday("27-07-1999")
-                .country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
+                .country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(new BigDecimal(1000))
                 .build();
         accountsRepository.save(account);
 

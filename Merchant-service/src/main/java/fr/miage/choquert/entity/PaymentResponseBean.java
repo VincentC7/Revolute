@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class PaymentResponseBean {
 
-    private Long id;
     private String message;
     private BigDecimal ammout;
     private int port;

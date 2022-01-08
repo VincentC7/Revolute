@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -26,7 +27,7 @@ public class Operation implements Serializable {
     private String operationId;
     private Instant datePerformed;
     private String libelle;
-    private double montant;
+    private BigDecimal montant;
     private String ibanCrediteur;
     private String categorie;
     private String country;

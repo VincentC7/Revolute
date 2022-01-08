@@ -28,6 +28,7 @@ import javax.validation.Valid;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class AccountRepresentation {
                 .iban(iban).accountNumber(iban.substring(14,25))
                 .name(account.getName()).surname(account.getSurname()).birthday(account.getBirthday())
                 .country(account.getCountry()).passport(account.getPassport()).tel(account.getTel())
-                .secret(account.getSecret()).balance(0.0)
+                .secret(account.getSecret()).balance(new BigDecimal(1000))
                 .build();
         Account saved = accountsRepository.save(account2save);
         URI location = linkTo(AccountRepresentation.class).slash(saved.getAccountId()).toUri();
