@@ -11,20 +11,16 @@ spring:
           '[/**]':
             allowedOrigins: '*'
             allowedMethods:
-              - GET
+              - POST
       routes:
         - id: Merchant
           uri: lb://Merchant-service/
           predicates:
-            - Path=/pay/**
-          filters:
-            - RewritePath=/pay/(?<path>.*), /Merchant-devise/$\{path}
+            - Path=/pay
         - id: Banque
           uri: lb://Banque-service/
           predicates:
-            - Path=/pay/**
-          filters:
-            - RewritePath=/pay/(?<path>.*), /$\{path}
+            - Path=/pay
     loadbalancer:
       ribbon:
         enabled: false

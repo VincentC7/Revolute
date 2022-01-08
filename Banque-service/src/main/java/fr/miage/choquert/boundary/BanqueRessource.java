@@ -1,13 +1,12 @@
 package fr.miage.choquert.boundary;
 
-import fr.miage.choquert.entities.operation.Operation;
+import fr.miage.choquert.entities.operation.OperationInput;
 import fr.miage.choquert.entities.operation.OperationMerchant;
 import fr.miage.choquert.repositories.OperationRepository;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -22,14 +21,14 @@ public class BanqueRessource {
         this.operationRepository = operationRepository;
     }
 
-    @GetMapping("/pay/card/{number}/code/{code}/ammount/{ammout}")
-    public OperationMerchant getValeurDeChange(@PathVariable String number, @PathVariable String code, @PathVariable BigDecimal ammout) {
+    @PostMapping("/pay")
+    public OperationMerchant pay(@RequestBody @Valid OperationInput operationInput){
+        System.out.println(operationInput);
         return OperationMerchant.builder()
                 .id(1L)
                 .message("Paiement acceptée")
-                .ammout(ammout)
+                .ammout(new BigDecimal(1))
                 .port(Integer.parseInt(Objects.requireNonNull(environment.getProperty("local.server.port"))))
                 .build();
     }
-
 }
