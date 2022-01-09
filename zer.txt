@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  # ============================= Databases ========================================
+  banque-pg:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=BanqueServiceUser
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=BanqueService
+    volumes:
+      - ./data/banque_pg:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  keycloack-pg:
+    image: 'postgres:13.1-alpine'
+    container_name: db-keycloack
+    environment:
+      - POSTGRES_USER=keycloackUser
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=keycloack
+    volumes:
+      - ./data/keycloack_pg:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: keycloakPassword
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./keycloak-data:/var/lib/mysql
+
+  # ============================= Banque service ========================================
+  banque:
+    build:
+      context: ./Banque-service
+    depends_on:
+      - banque-pg
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/BanqueService
+      - SPRING_DATASOURCE_USERNAME=BanqueServiceUser
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - "8100:8082"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+  # ================================ keycloack ===========================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:15.0.2
+    ports:
+      - "8180:8180"
+    command: [ "-Djboss.socket.binding.port-offset=100" ]
+    environment:
+      DB_VENDOR: mysql
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloakPassword
+      DB_SCHEMA: public
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+    depends_on:
+      - mysql
+
+volumes:
+  data:
+  keycloak-data:

@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: Gateway-bank-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods:
+              - POST
+      routes:
+        - id: Merchant
+          uri: lb://Merchant-service/
+          predicates:
+            - Path=/pay
+        - id: Banque
+          uri: lb://Banque-service/
+          predicates:
+            - Path=/pay
+    loadbalancer:
+      ribbon:
+        enabled: false
+    consul:
+      config:
+        enabled: false
+
+server:
+  port: 8100
+

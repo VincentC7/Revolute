@@ -7,6 +7,7 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class Account implements Serializable {
     private String passport;
     private String tel;
     private String secret;
-    private Double balance;
+    private BigDecimal balance;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @ToString.Exclude

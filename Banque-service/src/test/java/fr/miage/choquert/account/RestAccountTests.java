@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.apache.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -46,7 +47,7 @@ class RestAccountTests {
 				.accountId(UUID.randomUUID().toString())
 				.iban("FR9810096000505697927118M38").accountNumber("5697927118M")
 				.name("Choquert").surname("Vincent").birthday("27-07-1999")
-				.country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(0.0)
+				.country("France").passport("123456789").tel("+0033636790462").secret("secret").balance(new BigDecimal(1000))
 				.build();
 		accountsRepository.save(account);
 	}
