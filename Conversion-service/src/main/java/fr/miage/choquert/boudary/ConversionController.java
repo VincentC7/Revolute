@@ -30,12 +30,14 @@ public class ConversionController {
 
         if (exchangeRateRequest.isEmpty()){
             return ConversionResponse.builder()
+                    .messsage("currency not supported")
                     .rate(new BigDecimal(-1))
                     .build();
         }
 
         ExchangeRate exchangeRate = exchangeRateRequest.get();
         return ConversionResponse.builder()
+                .messsage("currency supported")
                 .beforeConversion(amout)
                 .afterConversion(amout.multiply(exchangeRate.getRate()))
                 .rate(exchangeRate.getRate())

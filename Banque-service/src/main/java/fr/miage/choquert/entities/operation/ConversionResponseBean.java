@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OperationMerchant {
+public class ConversionResponseBean {
 
     private String message;
-    private BigDecimal ammout;
-    private String currency;
-    private int port;
+    private BigDecimal beforeConversion;
+    private BigDecimal afterConversion;
+    private BigDecimal rate;
 
 }

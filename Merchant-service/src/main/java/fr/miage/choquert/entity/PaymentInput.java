@@ -41,4 +41,15 @@ public class PaymentInput {
     @NotNull
     private BigDecimal amount;
 
+    @NotBlank
+    @NotNull
+    @Size(min = 3, max = 3)
+    @Pattern(regexp = "[a-zA-Z]{3}")
+    private String currency;
+
+    @NotBlank
+    @NotNull
+    @Pattern(regexp="^[A-Z]{2}[0-9]{22}[A-Z][0-9]{2}?$")
+    private String iban;
+
 }

@@ -28,6 +28,7 @@ public class Operation implements Serializable {
     private Instant datePerformed;
     private String libelle;
     private BigDecimal montant;
+    private BigDecimal rate;
     private String ibanCrediteur;
     private String categorie;
     private String country;

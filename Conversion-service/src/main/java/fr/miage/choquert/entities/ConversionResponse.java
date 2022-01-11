@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ConversionResponse {
 
+    private String messsage;
     private BigDecimal beforeConversion;
     private BigDecimal afterConversion;
     private BigDecimal rate;

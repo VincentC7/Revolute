@@ -1,6 +1,5 @@
 package fr.miage.choquert.card;
 
-import fr.miage.choquert.entities.account.Account;
 import fr.miage.choquert.entities.card.Card;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class CardTests {
     @Test
     @DisplayName("cryptogram generator")
     public void testGenerateCrypto(){
-        String crypto = String.valueOf(Card.randomCrypto());
+        String crypto = Card.randomCrypto();
         assertEquals(3, crypto.length());
         assertThat(crypto, matchesPattern("[0-9]{3}"));
     }
