@@ -23,7 +23,7 @@ public class Card implements Serializable {
     private String cardId;
     private String cardNumber;
     private String code;
-    private int cryptogram;
+    private String cryptogram;
     private double ceiling;
     private boolean blocked;
     private boolean contact;
@@ -52,8 +52,8 @@ public class Card implements Serializable {
         return randomStringNumber(16);
     }
 
-    public static int randomCrypto(){
-        return Integer.parseInt(randomStringNumber(3));
+    public static String randomCrypto(){
+        return randomStringNumber(3);
     }
 
     private static String randomStringNumber(int length){

@@ -14,6 +14,7 @@ public class OperationMerchant {
 
     private String message;
     private BigDecimal ammout;
+    private String currency;
     private int port;
 
 }

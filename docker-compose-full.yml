@@ -1,0 +1,175 @@
+version: '3'
+
+services:
+  # =============================== Databases =========================================
+  banque-pg:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=BanqueServiceUser
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=BanqueService
+    volumes:
+      - ./data/banque_pg:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - app
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    container_name: keycloak_db
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: keycloakPassword
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./data/keycloack_pg-data:/var/lib/mysql
+    networks:
+      - app
+
+  # =============================== keycloack =========================================
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:15.0.2
+    ports:
+      - "8180:8180"
+    command: [ "-Djboss.socket.binding.port-offset=100" ]
+    environment:
+      DB_VENDOR: mysql
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloakPassword
+      DB_SCHEMA: public
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+    depends_on:
+      - mysql
+    networks:
+      - app
+
+  # ============================ Banque service =======================================
+  banque-service:
+    build:
+      context: ./Banque-service
+    container_name: banque_service
+    depends_on:
+      - banque-pg
+      - consul
+    environment:
+      - SPRING_DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://banque-pg:5432/BanqueService
+      - SPRING_DATASOURCE_USERNAME=BanqueServiceUser
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SERVER_PORT=8280
+      - spring.cloud.consul.host=consul
+      - spring.cloud.consul.port=8500
+      - spring.cloud.consul.discovery.ip-address=true
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    ports:
+      - "8080:8080"
+    networks:
+      - app
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+  # =========================== Conversion service ====================================
+  conversion-service:
+    build:
+      context: ./Conversion-service
+    container_name: conversion_service
+    ports:
+      - "8280:8280"
+    environment:
+      - spring.cloud.consul.host=consul
+      - spring.cloud.consul.port=8500
+      - spring.cloud.consul.discovery.ip-address=true
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    depends_on:
+      - consul
+    networks:
+      - app
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+  # =========================== Conversion service ====================================
+  merchant-service:
+    build:
+      context: ./Merchant-service
+    container_name: merchant_service
+    ports:
+      - "9000:9000"
+    environment:
+      - spring.cloud.consul.host=consul
+      - spring.cloud.consul.port=8500
+      - spring.cloud.consul.discovery.ip-address=true
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    depends_on:
+      - consul
+    networks:
+      - app
+
+
+  # ================================ Gateway ==========================================
+  gw-bank-service:
+    build:
+      context: ./Gateway-bank-service
+    container_name: gw_banque_service
+    ports:
+      - "8100:8100"
+    environment:
+      - spring.cloud.consul.host=consul
+      - spring.cloud.consul.port=8500
+      - spring.cloud.consul.discovery.ip-address=true
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    depends_on:
+      - consul
+    networks:
+      - app
+
+
+  gw-conversion-service:
+    build:
+      context: ./Gateway-conversion-serive
+    container_name: gw_conversion_service
+    ports:
+      - "8101:8101"
+    environment:
+      - spring.cloud.consul.host=consul
+      - spring.cloud.consul.port=8500
+      - spring.cloud.consul.discovery.ip-address=true
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    depends_on:
+      - consul
+    networks:
+      - app
+
+  # ================================ consul ===========================================
+  consul:
+    image: consul
+    container_name: revolut_consul
+    ports:
+      - "8410:8400"
+      - "8510:8500"
+      - "8610:8600"
+    networks:
+      - app
+
+volumes:
+  data:
+
+networks:
+  app:
+    driver: bridge

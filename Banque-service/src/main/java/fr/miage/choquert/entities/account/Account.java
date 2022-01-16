@@ -20,6 +20,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Account implements Serializable {
 
+    public static final String ACCOUNT_DEVISE = "EUR";
+
     private static final long serialVersionUID = 267433254591L;
 
     @Id

@@ -25,6 +25,8 @@
         <module>Banque-service</module>
         <module>Merchant-service</module>
         <module>Gateway-bank-service</module>
+        <module>Conversion-service</module>
+        <module>Gateway-conversion-serive</module>
     </modules>
 
     <properties>

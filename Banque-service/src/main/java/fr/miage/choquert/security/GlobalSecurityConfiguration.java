@@ -25,11 +25,13 @@ public class GlobalSecurityConfiguration extends KeycloakWebSecurityConfigurerAd
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.cors().and().csrf().disable().sessionManagement().
-        sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests()
-            .anyRequest().permitAll();
+        http.cors().and().csrf().disable().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/accounts/{accountId}").authenticated()
+                .antMatchers("/accounts/{accountId}/**").authenticated()
+                .anyRequest().permitAll();
     }
 
     @Bean
@@ -44,15 +46,10 @@ public class GlobalSecurityConfiguration extends KeycloakWebSecurityConfigurerAd
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
     }
 
-    //@Override
-    //public void configure(AuthenticationManagerBuilder auth) {
-    //    KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-    //    auth.authenticationProvider(keycloakAuthenticationProvider);
-    //}
 }

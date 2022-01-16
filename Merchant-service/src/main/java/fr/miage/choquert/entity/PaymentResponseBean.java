@@ -15,6 +15,7 @@ public class PaymentResponseBean {
 
     private String message;
     private BigDecimal ammout;
+    private String currency;
     private int port;
 
 }

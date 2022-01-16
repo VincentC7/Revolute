@@ -61,14 +61,14 @@ public class RestCardTests {
 
         card = Card.builder()
                 .cardId(UUID.randomUUID().toString())
-                .cardNumber("1111111111111111").cryptogram(111).code("1234")
+                .cardNumber("1111111111111111").cryptogram("111").code("1234")
                 .ceiling(1000.0).blocked(false).virtual(false).contact(true)
                 .latitude(0.0).latitude(0.0).account(account)
                 .build();
         cardsRepository.save(card);
         card2 = Card.builder()
                 .cardId(UUID.randomUUID().toString())
-                .cardNumber("2222222222222222").cryptogram(111).code("5678")
+                .cardNumber("2222222222222222").cryptogram("111").code("5678")
                 .ceiling(500.0).blocked(false).virtual(false).contact(true)
                 .latitude(0.0).latitude(0.0).account(account)
                 .build();

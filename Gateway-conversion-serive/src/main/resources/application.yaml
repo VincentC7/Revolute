@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: Gateway-conversion-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods:
+              - GET
+      routes:
+        - id: Conversion
+          uri: lb://Merchant-service/
+          predicates:
+            - Path=/conversion-devise/**
+        - id: Banque
+          uri: lb://Banque-service/
+          predicates:
+            - Path=/pay
+    loadbalancer:
+      ribbon:
+        enabled: false
+    consul:
+      config:
+        enabled: false
+
+server:
+  port: 8101
+

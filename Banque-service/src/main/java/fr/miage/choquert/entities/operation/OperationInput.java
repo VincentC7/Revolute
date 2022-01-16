@@ -42,4 +42,12 @@ public class OperationInput {
     @NotNull
     private BigDecimal amount;
 
+    @NotNull
+    @NotBlank
+    private String currency;
+
+    @NotNull
+    @NotBlank
+    @Pattern(regexp="^[A-Z]{2}[0-9]{22}[A-Z][0-9]{2}?$")
+    private String iban;
 }
