@@ -65,7 +65,7 @@ public class BanqueRessource {
 
         return OperationMerchant.builder()
                 .message(message)
-                .ammout(operationAmmount)
+                .ammout(operationInput.getAmount())
                 .currency(operationInput.getCurrency())
                 .port(Integer.parseInt(Objects.requireNonNull(environment.getProperty("local.server.port"))))
                 .build();
