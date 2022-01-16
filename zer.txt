@@ -4,7 +4,7 @@ services:
   # ============================= Databases ========================================
   banque-pg:
     image: 'postgres:13.1-alpine'
-    container_name: db
+    container_name: banque-pg
     environment:
       - POSTGRES_USER=BanqueServiceUser
       - POSTGRES_PASSWORD=123456
@@ -14,20 +14,9 @@ services:
     ports:
       - "5433:5432"
 
-  keycloack-pg:
-    image: 'postgres:13.1-alpine'
-    container_name: db-keycloack
-    environment:
-      - POSTGRES_USER=keycloackUser
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=keycloack
-    volumes:
-      - ./data/keycloack_pg:/var/lib/postgresql/data
-    ports:
-      - "5434:5432"
-
   mysql:
     image: mysql:5.7
+    container_name: mysql
     restart: always
     environment:
       MYSQL_DATABASE: keycloak
@@ -35,30 +24,11 @@ services:
       MYSQL_PASSWORD: keycloakPassword
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - ./keycloak-data:/var/lib/mysql
-
-  # ============================= Banque service ========================================
-  banque:
-    build:
-      context: ./Banque-service
-    depends_on:
-      - banque-pg
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/BanqueService
-      - SPRING_DATASOURCE_USERNAME=BanqueServiceUser
-      - SPRING_DATASOURCE_PASSWORD=123456
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    ports:
-      - "8100:8082"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
+      - ./data/keycloack_pg-data:/var/lib/mysql
 
   # ================================ keycloack ===========================================
   keycloak:
+    container_name: keycloak
     image: quay.io/keycloak/keycloak:15.0.2
     ports:
       - "8180:8180"
@@ -75,6 +45,75 @@ services:
     depends_on:
       - mysql
 
+  # ============================= Banque service ========================================
+  banque-service:
+    build:
+      context: ./Banque-service
+    container_name: banque-service
+    depends_on:
+      - banque-pg
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/BanqueService
+      - SPRING_DATASOURCE_USERNAME=BanqueServiceUser
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - "8080:8080"
+    networks:
+      - consul-net
+    #deploy:
+    #  restart_policy:
+    #    condition: on-failure
+    #    delay: 10s
+    #    max_attempts: 3
+    #    window: 120s
+
+  # =========================== Marchand service ======================================
+  merchant-service:
+    build:
+      context: ./Merchant-service
+    container_name: merchant-service
+    ports:
+      - "9000:9000"
+    networks:
+      - consul-net
+    #deploy:
+    #  restart_policy:
+    #    condition: on-failure
+    #    delay: 10s
+    #    max_attempts: 3
+    #    window: 120s
+
+  # ============================ Conversion service =====================================
+  conversion-service:
+    build:
+      context: ./Conversion-service
+    container_name: conversion-service
+    ports:
+      - "8280:8280"
+    networks:
+      - consul-net
+    #deploy:
+    #  restart_policy:
+    #    condition: on-failure
+    #    delay: 10s
+    #    max_attempts: 3
+    #    window: 120s
+
+  # ================================ consul ===========================================
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+    networks:
+      - consul-net
+
 volumes:
   data:
-  keycloak-data:
+
+networks:
+  consul-net:
+    driver: bridge

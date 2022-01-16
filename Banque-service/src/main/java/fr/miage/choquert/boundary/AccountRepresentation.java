@@ -6,6 +6,7 @@ import fr.miage.choquert.entities.account.Account;
 
 import fr.miage.choquert.entities.account.AccountInput;
 import fr.miage.choquert.repositories.AccountsRepository;
+import fr.miage.choquert.security.AccountMatcher;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -14,7 +15,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.keycloak.Token;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
@@ -64,8 +67,11 @@ public class AccountRepresentation {
     @GetMapping(value = "/{accountId}")
     public ResponseEntity<?> getOneCompte(@PathVariable("accountId") String accountId) {
         return Optional.of(accountsRepository.findById(accountId)).filter(Optional::isPresent)
-                .map(i -> ResponseEntity.ok(assembler.toModel(i.get())))
-                .orElse(ResponseEntity.notFound().build());
+                .map(i -> {
+                    KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                    if (AccountMatcher.isAccountOwner(i.get(), authentication)) return ResponseEntity.ok(assembler.toModel(i.get()));
+                    return ResponseEntity.status(403).build();
+                }).orElse(ResponseEntity.notFound().build());
     }
 
     // POST /accounts
@@ -105,6 +111,8 @@ public class AccountRepresentation {
         Optional<Account> body = accountsRepository.findById(accountId);
         if (body.isPresent()) {
             Account account = body.get();
+            KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            if (!AccountMatcher.isAccountOwner(account, authentication)) return ResponseEntity.status(403).build();
             AtomicBoolean badrequest = new AtomicBoolean(false);
             String[] immutableParams = {"accountId","iban","accountNumber","balance"};
             fields.forEach((f, v) -> {
@@ -148,12 +156,14 @@ public class AccountRepresentation {
     })
     public ResponseEntity<?> getAccountBalance(@PathVariable("accountId") String accountId) {
         return Optional.of(accountsRepository.findById(accountId)).filter(Optional::isPresent)
-                .map(i -> ResponseEntity.ok().body(
-                        "{\n" +
-                                "\t\"balance\" :"+i.get().getBalance()+",\n" +
-                        "}"
-                        ))
-                .orElse(ResponseEntity.notFound().build());
+                .map(i -> {
+                    KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                    if (!AccountMatcher.isAccountOwner(i.get(), authentication)) return ResponseEntity.status(403).build();
+                    return ResponseEntity.ok().body(
+                            "{\n" +
+                                    "\t\"balance\" :"+i.get().getBalance()+",\n" +
+                            "}");
+                }).orElse(ResponseEntity.notFound().build());
     }
 
 }
