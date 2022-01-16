@@ -6,7 +6,6 @@ import fr.miage.choquert.entities.card.Card;
 import fr.miage.choquert.entities.operation.Operation;
 import fr.miage.choquert.repositories.AccountsRepository;
 import fr.miage.choquert.repositories.OperationRepository;
-import fr.miage.choquert.security.AccountMatcher;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,11 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,8 +53,6 @@ public class OperationRepresentation {
     public ResponseEntity<?> getAccountOperations(@PathVariable("accountId") String accountId) {
         Optional<Account> account = accountsRepository.findById(accountId);
         if (account.isPresent()) {
-            KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (!AccountMatcher.isAccountOwner(account.get(), authentication)) return ResponseEntity.status(403).build();
             return ResponseEntity.ok(operationAssembler.toCollectionModel(
                     operationRepository.findByAccount(account.get()),
                     accountId
@@ -81,8 +76,6 @@ public class OperationRepresentation {
     public ResponseEntity<?> getOneOperation(@PathVariable("accountId") String accountId, @PathVariable("operationId") String operationId) {
         Optional<Account> account = accountsRepository.findById(accountId);
         if(account.isEmpty()) return ResponseEntity.notFound().build();
-        KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (!AccountMatcher.isAccountOwner(account.get(), authentication)) return ResponseEntity.status(403).build();
         return Optional.of(operationRepository.findById(operationId)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(operationAssembler.toModel(i.get(), accountId)))
                 .orElse(ResponseEntity.notFound().build());

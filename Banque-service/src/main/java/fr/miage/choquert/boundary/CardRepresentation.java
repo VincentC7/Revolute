@@ -7,7 +7,6 @@ import fr.miage.choquert.entities.card.CardInput;
 import fr.miage.choquert.entities.card.CardValidator;
 import fr.miage.choquert.repositories.AccountsRepository;
 import fr.miage.choquert.repositories.CardsRepository;
-import fr.miage.choquert.security.AccountMatcher;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -17,11 +16,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,8 +68,6 @@ public class CardRepresentation {
     public ResponseEntity<?> getAccountCards(@PathVariable("accountId") String accountId) {
         Optional<Account> account = accountsRepository.findById(accountId);
         if (account.isPresent()) {
-            KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (!AccountMatcher.isAccountOwner(account.get(), authentication)) return ResponseEntity.status(403).build();
             return ResponseEntity.ok(cardAssembler.toCollectionModel(
                     cardsRepository.findByAccount(account.get()), accountId
             ));
@@ -97,11 +92,7 @@ public class CardRepresentation {
         Optional<Account> account = accountsRepository.findById(accountId);
         if(account.isEmpty()) return ResponseEntity.notFound().build();
         return Optional.of(cardsRepository.findById(cardId)).filter(Optional::isPresent)
-                .map(i -> {
-                    KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-                    if (!AccountMatcher.isAccountOwner(account.get(), authentication)) return ResponseEntity.status(403).build();
-                    return ResponseEntity.ok(cardAssembler.toModel(i.get(), accountId));
-                }).orElse(ResponseEntity.notFound().build());
+                .map(i -> ResponseEntity.ok(cardAssembler.toModel(i.get(), accountId))).orElse(ResponseEntity.notFound().build());
     }
 
     //POST /accounts/{accountId}/cards
@@ -117,8 +108,6 @@ public class CardRepresentation {
     public ResponseEntity<?> saveCard(@PathVariable("accountId") String accountId, @RequestBody @Valid CardInput card)  {
         Optional<Account> account = accountsRepository.findById(accountId);
         if (account.isPresent()){
-            KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (!AccountMatcher.isAccountOwner(account.get(), authentication)) return ResponseEntity.status(403).build();
             Card card2save = Card.builder()
                     .cardId(UUID.randomUUID().toString()).cardNumber(Card.randomCardNumber())
                     .code(card.getCode()).cryptogram(Card.randomCrypto()).ceiling(card.getCeiling())
@@ -151,8 +140,6 @@ public class CardRepresentation {
         Optional<Account> body_account = accountsRepository.findById(accountId);
         if (body_account.isEmpty()) return ResponseEntity.notFound().build();
         Account account = body_account.get();
-        KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if (!AccountMatcher.isAccountOwner(account, authentication)) return ResponseEntity.status(403).build();
         Optional<Card> body_card = cardsRepository.findById(cardId);
         if (body_card.isEmpty()) return ResponseEntity.notFound().build();
         Card card = body_card.get();
